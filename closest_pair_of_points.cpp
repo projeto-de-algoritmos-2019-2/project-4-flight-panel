@@ -22,7 +22,7 @@ struct closest_points
     point A, B;
 };
 
-double min_dist = 5;
+double min_dist = 90;
 double min_square_dist = min_dist * min_dist;
 
 using pair = std::pair<point, point>;
@@ -200,7 +200,7 @@ closest_points minimal_distance(std::vector<point>& points) {
         }
     );
 
-    closest_points cp = minimal_distance_rec(points.begin(), points.end());
+    closest_points cp = minimal_distance_naive(points.begin(), points.end());
     cp.dist = std::sqrt(cp.dist);
 
     return cp;

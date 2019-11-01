@@ -59,26 +59,34 @@ def fetch_closest_points(flights):
             cpp_param+=f" {point[0]} {point[1]}"
 
         cmd = f'echo "{cpp_param}" | ./a.out'
-
         response = os.popen(cmd).readlines()
 
-        dist = response[0][:-1]
-        p1 = response[1][:-1]
-        p2 = response[2][:-1]
+        n = int(response[0][:-1])
 
-        p1, p2 = [int(a) for a in p1.split()], [int(a) for a in p2.split()]
+        objs = []
 
-        p1tuple, p2tuple = (p1[0], p1[1]), (p2[0], p2[1])
+        for i in range(n):
+            p = response[i+1][:-1]
+            p = [float(a) for a in p.split()]
+            
+            dist = p[-1]
 
-        ret_obj = {
-            'distance': float(dist),
-            'p1': p1tuple,
-            'p2': p2tuple
-        }
+            p = p[:-1]
 
-        return ret_obj
+            p1tuple, p2tuple = p[:2], p[2:]
 
-    return {'distance': 10000000}
+            ret_obj = {
+                'distance': float(dist),
+                'p1': p1tuple,
+                'p2': p2tuple
+            }
+
+            if not ret_obj in objs:
+                objs.append(ret_obj)
+    
+        return objs
+
+    return []
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
@@ -92,6 +100,8 @@ mapim.convert()
 start_ticks=pygame.time.get_ticks()
 
 reload_time = 15
+
+os.system("g++ -std=c++17 closest_pair_of_points.cpp")
 
 while not done:
         for event in pygame.event.get():
@@ -122,14 +132,14 @@ while not done:
             not_fetched = True
 
         if gflights != None:
-            dist_obj = fetch_closest_points(gflights)
+            lines = fetch_closest_points(gflights)
 
             for flight in gflights:
                 text = font.render(flight['id'], True, (255, 0, 0))
                 screen.blit(text, (flight['x'], flight['y'] + text.get_height() + 3))
                 pygame.draw.circle(screen, (255, 0, 0), (flight['x'], flight['y']), 7)
 
-            if dist_obj['distance'] <= 1000:
+            for dist_obj in lines:
                 text = font.render(str(dist_obj['distance']), True, (0, 0, 0))
 
                 text_pos = (
