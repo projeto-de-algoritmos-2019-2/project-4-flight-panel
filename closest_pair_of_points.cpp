@@ -7,6 +7,12 @@ struct point {
     double x, y;
 };
 
+struct closest_points
+{
+    double dist;
+    point A, B;
+};
+
 using pair = std::pair<point, point>;
 
 double square_distance(const point& lhs, const point& rhs) {
@@ -17,7 +23,7 @@ double square_distance(const point& lhs, const point& rhs) {
 
 using Iterator = std::vector<point>::iterator;
 
-double minimal_distance_naive(Iterator first, Iterator last) {
+closest_points minimal_distance_naive(Iterator first, Iterator last) {
     
     pair closest{*first, *std::next(first)};
 
@@ -39,8 +45,15 @@ double minimal_distance_naive(Iterator first, Iterator last) {
             );
         }
     }
+
+    closest_points cp;
+
+    cp.dist = square_distance(closest.first, closest.second);
+    cp.A = closest.first;
+    cp.B = closest.second;
+
     
-    return square_distance(closest.first, closest.second);
+    return cp;
 }
 
 bool is_inside_rectangle(const point& input, const point& up_left, const point& bottom_right) {
@@ -62,17 +75,33 @@ pair candidates_rectangle(const point& p, double square_dist) {
 }
 
 
-double minimal_distance_rec(Iterator first, Iterator last, const std::size_t threshold = 3) {
+closest_points minimal_distance_rec(Iterator first, Iterator last, const std::size_t threshold = 3) {
     
-    if (std::distance(first, last) <= threshold) 
+    if (std::distance(first, last) <= threshold)
         return minimal_distance_naive(first, last);
 
     auto pivot = std::next(first, std::distance(first, last) / 2);
 
-    auto min_left = minimal_distance_rec(first, pivot);
-    auto min_right = minimal_distance_rec(pivot, last);
+    auto cp_min_left = minimal_distance_rec(first, pivot);
+    auto min_left = cp_min_left.dist;
 
-    auto temp_min = std::min(min_left, min_right);
+    auto cp_min_right = minimal_distance_rec(pivot, last);
+    auto min_right = cp_min_right.dist;
+
+    closest_points cp;
+    double temp_min;
+
+    if(min_left < min_right) {
+        temp_min = min_left;
+        cp = cp_min_left;
+    }
+
+    else {
+        temp_min = min_right;
+        cp = cp_min_right;
+    }
+
+    // auto temp_min = std::min(min_left, min_right);
 
     // define the band inside which distance can be less than temp_min
     auto not_too_left = std::partition(
@@ -112,13 +141,19 @@ double minimal_distance_rec(Iterator first, Iterator last, const std::size_t thr
             }
         );
 
-        temp_min = std::min(temp_min, square_distance(lp, *middle_closest));
+        double sd = square_distance(lp, *middle_closest);
+
+        if(sd < temp_min) {
+            temp_min = sd;
+            cp.A = lp;
+            cp.B = *middle_closest;
+        }
     });
 
-    return temp_min;
+    return cp;
 }
 
-double minimal_distance(std::vector<point>& points) {
+closest_points minimal_distance(std::vector<point>& points) {
     
     std::sort(
         points.begin(), 
@@ -128,7 +163,10 @@ double minimal_distance(std::vector<point>& points) {
         }
     );
 
-    return std::sqrt(minimal_distance_rec(points.begin(), points.end()));
+    closest_points cp = minimal_distance_rec(points.begin(), points.end());
+    cp.dist = std::sqrt(cp.dist);
+
+    return cp;
 }
 
 int main() {
@@ -141,7 +179,13 @@ int main() {
     for(auto &[x,y] : points)
         std::cin >> x >> y;
 
-    double dist = minimal_distance(points);
+    closest_points cp = minimal_distance(points);
+
+    double dist = cp.dist;
     
     std::cout << "min dist = " << dist << std::endl;
+    std::cout << "Point A: (" << cp.A.x  << ", " << cp.A.y << ")" <<  std::endl;
+    std::cout << "Point B: (" << cp.B.x  << ", " << cp.B.y << ")" <<  std::endl;
+
+    return 0;
 }
