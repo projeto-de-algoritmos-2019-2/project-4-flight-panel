@@ -183,9 +183,9 @@ int main() {
 
     double dist = cp.dist;
     
-    std::cout << "min dist = " << dist << std::endl;
-    std::cout << "Point A: (" << cp.A.x  << ", " << cp.A.y << ")" <<  std::endl;
-    std::cout << "Point B: (" << cp.B.x  << ", " << cp.B.y << ")" <<  std::endl;
+    std::cout << dist << std::endl;
+    std::cout << cp.A.x  << " " << cp.A.y << std::endl;
+    std::cout << cp.B.x  << " " << cp.B.y << std::endl;
 
     return 0;
 }
