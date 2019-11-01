@@ -3,8 +3,17 @@
 #include <vector>
 #include <cmath>
 
+#define EPS 1e-9
+
 struct point {
     double x, y;
+
+    bool operator==(point other) const {
+        return (
+            std::fabs(x-other.x) < EPS && 
+            std::fabs(y-other.y) < EPS
+        );
+    }
 };
 
 struct closest_points
@@ -13,7 +22,17 @@ struct closest_points
     point A, B;
 };
 
+double min_dist = 5;
+double min_square_dist = min_dist * min_dist;
+
 using pair = std::pair<point, point>;
+
+bool equal_pair(pair Pa, pair Pb) {
+    return (
+        Pa.first == Pb.first && 
+        Pa.second == Pb.second
+    );
+}
 
 double square_distance(const point& lhs, const point& rhs) {
     double adj = std::abs(lhs.x - rhs.x);
@@ -22,6 +41,16 @@ double square_distance(const point& lhs, const point& rhs) {
 }
 
 using Iterator = std::vector<point>::iterator;
+
+std::vector<pair> answer;
+void check_dist(const point& lhs, const point& rhs) {
+
+    double d = square_distance(lhs, rhs);
+    
+    if(d <= min_square_dist) {
+        answer.push_back({lhs, rhs});
+    }
+}
 
 closest_points minimal_distance_naive(Iterator first, Iterator last) {
     
@@ -40,6 +69,10 @@ closest_points minimal_distance_naive(Iterator first, Iterator last) {
                 closest, 
                 temp, 
                 [](const auto& lhs, const auto& rhs) {
+                    
+                    check_dist(lhs.first, lhs.second);
+                    check_dist(rhs.first, rhs.second);
+
                     return square_distance(lhs.first, lhs.second) < square_distance(rhs.first, rhs.second);
                 }
             );
@@ -51,7 +84,6 @@ closest_points minimal_distance_naive(Iterator first, Iterator last) {
     cp.dist = square_distance(closest.first, closest.second);
     cp.A = closest.first;
     cp.B = closest.second;
-
     
     return cp;
 }
@@ -137,6 +169,11 @@ closest_points minimal_distance_rec(Iterator first, Iterator last, const std::si
             pivot, 
             outside, 
             [=](const auto& lhs, const auto& rhs) {
+
+                check_dist(lp, lhs);
+                check_dist(lp, rhs);
+                check_dist(lhs, rhs);
+
                 return square_distance(lp, lhs) < square_distance(lp, rhs);
             }
         );
@@ -183,9 +220,17 @@ int main() {
 
     double dist = cp.dist;
     
-    std::cout << dist << std::endl;
-    std::cout << cp.A.x  << " " << cp.A.y << std::endl;
-    std::cout << cp.B.x  << " " << cp.B.y << std::endl;
+    // std::cout << dist << std::endl;
+    std::cout << answer.size() << std::endl;
+    // std::cout << cp.A.x  << " " << cp.A.y << std::endl;
+    // std::cout << cp.B.x  << " " << cp.B.y << std::endl;
+
+    for(auto&[p1, p2] : answer) {
+
+        double dd = std::sqrt(square_distance(p1, p2));
+
+        std::cout << p1.x << " " << p1.y << " " << p2.x << " " << p2.y << " " <<  dd << std::endl;
+    }
 
     return 0;
 }
