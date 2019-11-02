@@ -47,7 +47,7 @@ These coordinates get the following region
   <img src="spmap.png">
 </p>
 
-[EXPLICAÇÃO DO MOURA DE O QUE É FEITO COM OS DADOS RETORNADOS DA API]
+In each request made to the API, the information regarding each aircraft position (latitude and longitude) is fetched. By converting the obtained coords into pixels coords, it is possible to plot the information over the map using pygame's engine.
 
 The aircraft coordinate data is used in the Closest pair of
 points problem algorithm
