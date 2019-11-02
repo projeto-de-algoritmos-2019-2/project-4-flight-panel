@@ -75,7 +75,7 @@ the minimum configured distance, this pair of points is saved.
   # Install the requirements
   $ pip install -r requirements.txt
 
-  # get in lightout directory
+  # get in flight panel directory
   $ cd flight-panel
 
   # Run the application
