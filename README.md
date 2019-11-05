@@ -17,6 +17,14 @@
   <img src="timelapse.gif">
 </p>
 
+**Número da Lista**: 4<br>
+**Conteúdo da Disciplina**: Dividir e conquistar<br>
+
+## Alunos
+| Matrícula  | Aluno                              |
+| ---------- | ---------------------------------- |
+| 15/0150792 | Victor Moura                       |
+| 16/0005191 | Durval Carvalho                    |
 
 ## About the project
 
